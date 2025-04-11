@@ -1,6 +1,5 @@
 [Unit]
 Description=My autogit download target
-Wants=autogit@autogit.service
 
 [Install]
 WantedBy=default.target
