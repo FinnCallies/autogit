@@ -1,0 +1,12 @@
+[Unit]
+Description=My autogit download service for git repo %i
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/home/fcallies/Documents/autogit/download.sh /home/fcallies/Documents/%i
+ExecStop=/home/fcallies/Documents/autogit/upload.sh /home/fcallies/Documents/%i
+
+[Install]
+WantedBy=autogit-download.target

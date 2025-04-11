@@ -1,0 +1,6 @@
+[Unit]
+Description=My autogit download target
+Wants=autogit@testrepo.service
+
+[Install]
+WantedBy=default.target
