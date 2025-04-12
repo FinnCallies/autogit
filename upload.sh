@@ -1,13 +1,15 @@
 #!/bin/bash
 
+LOG=$HOME/.var/log/automount/$(date '+%d-%m-%Y').log
+
 # Navigate to the repository path, if provided as argument
 if [ -n "$1" ]; then
-  cd "$1" || { echo "Repository path '$1' not found."; exit 1; }
+  cd "$1" || { echo "[ automount ] Repository path '$1' not found." >> LOG; exit 1; }
 fi
 
 # Check if current directory is a git repository
 if [ ! -d .git ]; then
-  echo "Not a git repository."
+  echo "[ automount ] $1 not a git repository." >> LOG
   exit 1
 fi
 
