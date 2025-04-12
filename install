@@ -1,0 +1,32 @@
+#!/bin/bash
+
+WARN=[ autogit ]: --WARNING--
+TARGET=.config/systemd/user/autogit.target.wants
+REPO=$HOME/$TARGET
+
+test -f ./autogit.target
+if [ $? -ne 0 ]
+    echo "$WARN no \"autogit.target\" in current directory"
+    exit 1
+fi
+
+systemctl link --user autogit.target
+if [ $? -ne 0 ]
+    echo "$WARN \"systemctl link --user ./autogit.target\" failed"
+    exit 1
+fi
+
+mkdir $REPO
+if [ $? -ne 0 ]
+    echo "$WARN unable to create \"$REPO\" directory"
+    exit 1
+fi
+
+systemctl enable --user autogit.target
+if [ $? -ne 0 ]
+    echo "$WARN \"systemctl enable --user autogit.target\" failed"
+    exit 1
+fi
+
+exit 0
+

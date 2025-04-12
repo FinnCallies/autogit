@@ -1,14 +1,18 @@
 #!/bin/bash
 
-REPO=/home/fcallies/.config/systemd/user/autogit.target.wants
-SOURCE=/home/fcallies/Documents/autogit/autogit@.service
+TARGET=.config/systemd/user/autogit.target.wants
+REPO=$HOME/$TARGET
+SOURCE=$HOME/Documents/autogit/autogit@.service
 
 print_help () {
-    echo "autogit"
-    echo "    help   prints this help"
-    echo "    ls     lists autogit entries"
-    echo "    add    adds new autogit entry"
-    echo "    rm     removes autogit entry"
+    echo "Usage: autogit CMD [ Project ]"
+    echo "Management tool for \$HOME/$TARGET"
+    echo ""
+    echo "commands:"
+    echo "    help               print this help"
+    echo "    ls                 list autogit entries"
+    echo "    add [ Project ]    add new autogit entry for [ Project ]"
+    echo "    rm  [ Project ]    remove autogit entry [ Project ]"
 }
 
 if [ $# -eq 0 ] || [ "$1" = "help" ]; then
@@ -16,6 +20,7 @@ if [ $# -eq 0 ] || [ "$1" = "help" ]; then
     exit 0
 fi
 
+# autogit ls
 if [ "$1" = "ls" ]; then
     files=($(ls $REPO))
 
@@ -27,63 +32,71 @@ if [ "$1" = "ls" ]; then
     exit 0
 fi
 
+# autogit add PROJECT
 if [ "$1" = "add" ] && [ $# -gt 1 ]; then
     files=($(ls $REPO))
 
     for file in "${files[@]}"; do
         f=$(echo "$file" | cut -d @ -f 2 | cut -d . -f 1)
         if [ "$f" = "$2" ]; then
-            echo "WARNING: autogit entry for $2 already exists"
-            exit 0
+            echo "[ autogit ]: --WARNING-- autogit entry for $2 already exists"
+            exit 1
         fi
     done
 
     ln -s $SOURCE $REPO/autogit@$2.service
     if [ $? -ne 0 ]; then
-        echo "WARNING: linking failed for systemd unit autogit@$2.service"
+        echo "[ autogit ]: --WARNING-- linking failed for systemd unit autogit@$2.service"
         exit 1
     fi
 
     systemctl daemon-reload --user
     if [ $? -ne 0 ]; then
-        echo "WARNING: systemctl daemon-reload failed"
+        echo "[ autogit ]: --WARNING-- systemctl daemon-reload failed" 
         exit 1
     fi
 
     systemctl start --user autogit@$2.service
     if [ $? -ne 0 ]; then
-        echo "WARNING: start of systemd unit autogit@$2.service"
+        echo "[ autogit ]: --WARNING-- start of systemd unit autogit@$2.service"
         exit 1
     fi
 
     exit 0
 fi
 
+# autogit rm PROJECT
 if [ "$1" = "rm" ] && [ $# -gt 1 ]; then
     files=($(ls $REPO))
 
     for file in "${files[@]}"; do
         f=$(echo "$file" | cut -d @ -f 2 | cut -d . -f 1)
-        if [ "$f" = "$2" ]; then
-            rm $REPO/autogit@$2.service
-            if [ $? -eq 0 ]; then
-                echo "autogit entry \"$2\" removed"
 
-                systemctl kill --user autogit@$2.service
-                if [ $? -ne 0 ]; then
-                    echo "WARNING: unable to stop systemd unit \"autogit@$2.service\""
-                    exit 1
-                fi
+        # wait for file match
+        if [ "$f" != "$2" ]; then
+            continue
+        fi
 
-                exit 0
-            fi
-            
-            echo "WARNING: autogit entry \"$2\" could not be removed"
+        entry=autogit@$2.service
+
+        rm $REPO/$entry
+        if [ $? -ne 0 ]; then
+            echo "[ autogit ]: --WARNING-- rm of \"$entry\" failed"
             exit 1
+        else
+            systemctl kill --user $entry
+            if [ $? -ne 0 ]; then
+                echo "[ autogit ]: --WARNING-- unable to stop systemd unit \"$entry\""
+                exit 1
+            fi
+
+            exit 0
         fi
     done
 
-    echo "WARNING: No autogit entry \"$2\" found"
-    exit 0
+    echo "[ autogit ]: --WARNING-- No autogit entry \"$entry\" found"
+    exit 1
 fi
 
+print_help
+exit 1
