@@ -13,6 +13,12 @@ if [ ! -d .git ]; then
   exit 1
 fi
 
+# check remote information
+git fetch
+if [ $? -ne 0 ]; then
+  echo "[ autogit ] $1: fetching remote repository information failed." >> LOG
+fi
+
 # Check for uncommitted changes
 if [[ -n $(git status --porcelain) ]]; then
   echo "[ autogit ] $1: Uncommitted changes found."
