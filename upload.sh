@@ -4,18 +4,18 @@ LOG=$HOME/.var/log/autogit/$(date '+%d-%m-%Y').log
 
 # Navigate to the repository path, if provided as argument
 if [ -n "$1" ]; then
-  cd "$1" || { echo "[ autogit ] Repository path '$1' not found." >> LOG; exit 1; }
+  cd "$1" || { echo "[ autogit ] $1: Repository path '$1' not found." >> LOG; exit 1; }
 fi
 
 # Check if current directory is a git repository
 if [ ! -d .git ]; then
-  echo "[ autogit ] $1 not a git repository." >> LOG
+  echo "[ autogit ] $1: $1 not a git repository." >> LOG
   exit 1
 fi
 
 # Check for uncommitted changes
 if [[ -n $(git status --porcelain) ]]; then
-  echo "Uncommitted changes found."
+  echo "[ autogit ] $1: Uncommitted changes found."
 
   # Add all changes
   git add -A
@@ -26,9 +26,9 @@ if [[ -n $(git status --porcelain) ]]; then
   # Commit with timestamp message
   git commit -m "Auto-commit: $timestamp"
 
-  echo "Changes commited."
+  echo "[ autogit ] $1: Changes commited."
 else
-  echo "No uncommitted changes."
+  echo "[ autogit ] $1: No uncommitted changes."
 fi
 
 git status -sb | grep "ahead" --quiet
@@ -37,8 +37,8 @@ if [[ $? -eq 0 ]]; then
   branch=$(git symbolic-ref --short HEAD)
   git push origin "$branch"
 
-  echo "Changes pushed to branch '$branch'."
+  echo "[ autogit ] $1: Changes pushed to branch '$branch'."
 else
-  echo "Nothing to push."
+  echo "[ autogit ] $1: Nothing to push."
 fi
 
