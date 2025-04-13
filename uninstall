@@ -1,0 +1,46 @@
+#!/bin/bash
+
+WARN=[ autogit ]: --WARNING--
+TARGET=.config/systemd/user/autogit.target.wants
+REPO=$HOME/$TARGET
+LOG=$HOME/.var/log/autogit
+
+if [ -d $LOG ]; then
+    rm -rf $LOG
+    if [ $? -ne 0 ]; then
+        echo "$WARN unable to remove \"$LOG\""
+    fi
+else
+    echo "$WARN directory \"$LOG\" not found"
+fi
+
+systemctl stop --user autogit.target
+if [ $? -ne 0 ]
+    echo "$WARN \"systemctl stop --user autogit.target\" failed"
+fi
+
+systemctl disable --user autogit.target
+if [ $? -ne 0 ]
+    echo "$WARN \"systemctl disable --user autogit.target\" failed"
+fi
+
+if [ -d $REPO ]; then
+    rm -rf $REPO
+    if [ $? -ne 0 ]; then
+        echo "$WARN unable to remove \"$REPO\""
+    fi
+else
+    echo "$WARN directory \"$REPO\" not found"
+fi
+
+if [ -f /usr/local/bin/autogit ]; then
+    rm /usr/local/bin/autogit
+    if [ $? -ne 0 ]; then
+        echo "$WARN unable to remove \"/usr/local/bin/autogit\""
+    fi
+else
+    echo "$WARN directory \"/usr/local/bin/autogit\" not found"
+fi
+
+exit 0
+

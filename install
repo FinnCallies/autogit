@@ -3,10 +3,17 @@
 WARN=[ autogit ]: --WARNING--
 TARGET=.config/systemd/user/autogit.target.wants
 REPO=$HOME/$TARGET
+LOG=$HOME/.var/log/autogit
 
 test -f ./autogit.target
 if [ $? -ne 0 ]
     echo "$WARN no \"autogit.target\" in current directory"
+    exit 1
+fi
+
+test -d $LOG
+if [ $? -ne 0 ]
+    echo "$WARN mkdir \"$LOG\" failed"
     exit 1
 fi
 
@@ -25,6 +32,12 @@ fi
 systemctl enable --user autogit.target
 if [ $? -ne 0 ]
     echo "$WARN \"systemctl enable --user autogit.target\" failed"
+    exit 1
+fi
+
+ln -s $(pwd)/autogit /usr/local/bin/autogit
+if [ $? -ne 0 ]; then
+    echo "$WARN installation of \"autogit\" to \"/usr/local/bin/autogit\" failed"
     exit 1
 fi
 
