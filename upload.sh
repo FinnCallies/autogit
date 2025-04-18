@@ -4,19 +4,19 @@ LOG=$HOME/.var/log/autogit/$(date '+%d-%m-%Y').log
 
 # Navigate to the repository path, if provided as argument
 if [ -n "$1" ]; then
-  cd "$1" || { echo "[ autogit ] $1: Repository path '$1' not found." >> LOG; exit 1; }
+  cd "$1" || { echo "[ autogit ] $1: Repository path '$1' not found." >> $LOG; exit 1; }
 fi
 
 # Check if current directory is a git repository
 if [ ! -d .git ]; then
-  echo "[ autogit ] $1: $1 not a git repository." >> LOG
+  echo "[ autogit ] $1: $1 not a git repository." >> $LOG
   exit 1
 fi
 
 # check remote information
 git fetch
 if [ $? -ne 0 ]; then
-  echo "[ autogit ] $1: fetching remote repository information failed." >> LOG
+  echo "[ autogit ] $1: fetching remote repository information failed." >> $LOG
 fi
 
 # Check for uncommitted changes
