@@ -44,9 +44,9 @@ if [[ $? -eq 0 ]]; then
   git push origin "$branch"
   if [[ $? -ne 0 ]]; then
     echo "$(date '+%H:%M:%S') [ autogit ] $1: Push to origin '$branch' failed." >> $LOG
+  else
+    echo "$(date '+%H:%M:%S') [ autogit ] $1: Changes pushed to branch '$branch'." >> $LOG
   fi
-
-  echo "$(date '+%H:%M:%S') [ autogit ] $1: Changes pushed to branch '$branch'." >> $LOG
 else
   echo "$(date '+%H:%M:%S') [ autogit ] $1: Nothing to push." >> $LOG
 fi
