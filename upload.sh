@@ -21,7 +21,7 @@ fi
 
 # Check for uncommitted changes
 if [[ -n $(git status --porcelain) ]]; then
-  echo "[ autogit ] $1: Uncommitted changes found."
+  echo "[ autogit ] $1: Uncommitted changes found." >> $LOG
 
   # Add all changes
   git add -A
@@ -32,9 +32,9 @@ if [[ -n $(git status --porcelain) ]]; then
   # Commit with timestamp message
   git commit -m "Auto-commit: $timestamp"
 
-  echo "[ autogit ] $1: Changes commited."
+  echo "[ autogit ] $1: Changes commited." >> $LOG
 else
-  echo "[ autogit ] $1: No uncommitted changes."
+  echo "[ autogit ] $1: No uncommitted changes." >> $LOG
 fi
 
 git status -sb | grep "ahead" --quiet
@@ -43,8 +43,8 @@ if [[ $? -eq 0 ]]; then
   branch=$(git symbolic-ref --short HEAD)
   git push origin "$branch"
 
-  echo "[ autogit ] $1: Changes pushed to branch '$branch'."
+  echo "[ autogit ] $1: Changes pushed to branch '$branch'." >> $LOG
 else
-  echo "[ autogit ] $1: Nothing to push."
+  echo "[ autogit ] $1: Nothing to push." >> $LOG
 fi
 
