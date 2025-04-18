@@ -42,6 +42,9 @@ if [[ $? -eq 0 ]]; then
   # Push to the current branch
   branch=$(git symbolic-ref --short HEAD)
   git push origin "$branch"
+  if [[ $? -ne 0 ]]; then
+    echo "$(date '+%H:%M:%S') [ autogit ] $1: Push to origin '$branch' failed." >> $LOG
+  fi
 
   echo "$(date '+%H:%M:%S') [ autogit ] $1: Changes pushed to branch '$branch'." >> $LOG
 else
