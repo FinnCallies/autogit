@@ -77,7 +77,8 @@ function upload() {
 
     git fetch
     if [[ -n $(git status --porcelain) ]]; then
-        local msg='[ autogit ] $(date "+%Y-%m-%d %H:%M:%S")'
+        local date=$(date "+%Y-%m-%d %H:%M:%S")
+        local msg="[ autogit ] $date"
 
         git add -A
         git commit -m "$msg"
