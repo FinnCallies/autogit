@@ -1,0 +1,11 @@
+[Unit]
+Description=[ autogit ] - Management tool for git repositories
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=%h/.local/bin/autogit upload
+ExecStop=%h/.local/bin/autogit download
+
+[Install]
+WantedBy=default.target

@@ -1,48 +1,46 @@
 #!/bin/bash
 
-WARN=[ autogit ]: --WARNING--
-TARGET=.config/systemd/user/autogit.target.wants
-REPO=$HOME/$TARGET
-LOG=$HOME/.var/log/autogit
+autogit="autogit.v2.sh"
+utils="utils.sh"
+store="autogit.store"
 
-test -f ./autogit.target
-if [ $? -ne 0 ]
-    echo "$WARN no \"autogit.target\" in current directory"
+if [[ ! -f "$(pwd)/$utils" ]]; then
+    echo "[ ERROR ]: utils.sh not available in $(pwd)"
     exit 1
 fi
 
-test -d $LOG
-if [ $? -ne 0 ]
-    echo "$WARN mkdir \"$LOG\" failed"
-    exit 1
-fi
+source ./utils.sh
 
-systemctl link --user autogit.target
-if [ $? -ne 0 ]
-    echo "$WARN \"systemctl link --user ./autogit.target\" failed"
-    exit 1
-fi
-
-test -d $REPO
-if [ $? -ne 0 ]; then
-    mkdir $REPO
-    if [ $? -ne 0 ]
-        echo "$WARN unable to create \"$REPO\" directory"
-        exit 1
+if [[ -f $autogit ]]; then
+    if [[ ! -d "$HOME/.local/bin" ]]; then
+        mkdir -p "$HOME/.local/bin"
     fi
+    cp $autogit "$HOME/.local/bin/autogit"
+    info "installed $autogit to $HOME/.local/bin/autogit"
 fi
 
-systemctl enable --user autogit.target
-if [ $? -ne 0 ]
-    echo "$WARN \"systemctl enable --user autogit.target\" failed"
-    exit 1
+if [[ -f $utils ]]; then
+    if [[ ! -d "$HOME/.local/include" ]]; then
+        mkdir -p "$HOME/.local/include"
+    fi
+    cp $utils "$HOME/.local/include/autogit-utils.sh"
+    info "installed $utils to $HOME/.local/include/autogit-utils.sh"
 fi
 
-ln -s $(pwd)/autogit /usr/local/bin/autogit
-if [ $? -ne 0 ]; then
-    echo "$WARN installation of \"autogit\" to \"/usr/local/bin/autogit\" failed"
-    exit 1
+if [[ ! -d "$HOME/.local/etc" ]]; then
+    mkdir -p "$HOME/.local/etc"
+fi
+touch "$HOME/.local/etc/$store"
+info "installed $store to $HOME/.local/etc/$store"
+
+which autogit &> /dev/null
+rc=$?
+if [[ $rc -ne 0 ]]; then
+    info "add $HOME/.local/bin to PATH"
+    export PATH="$HOME/.local/bin:$PATH"
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
 fi
 
-exit 0
-
+systemctl link --user ./autogit-v2.service
+systemctl enable --user autogit-v2.service
+systemctl start --user autogit-v2.service
